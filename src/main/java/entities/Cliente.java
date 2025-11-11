@@ -1,14 +1,13 @@
 package entities;
 
-class Cliente {
+public class Cliente {
 	private int id_cliente;
 	private String nombre;
 	private String dni_cliente;
 	private String telefono;
 	private String email;
 	
-	public Cliente(int id_cliente, String nombre, String dni_cliente, String telefono, String email) {
-		this.id_cliente = id_cliente;
+	public Cliente(String nombre, String dni_cliente, String telefono, String email) {
 		this.nombre = nombre;
 		this.dni_cliente = dni_cliente;
 		this.telefono = telefono;
