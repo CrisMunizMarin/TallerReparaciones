@@ -24,10 +24,10 @@ public class ClienteDAOMySQL implements ClienteDAO {
 		String sql = "INSERT INTO cliente(nombre, dni_cliente, telefono, email) VALUES(?,?,?,?);";
 		PreparedStatement pst =conexion.prepareStatement(sql);
 		
-		pst.setString(2, c.getNombre());
-		pst.setString(3, c.getDni_cliente());
-		pst.setString(4,c.getTelefono());
-		pst.setString(5,c.getEmail());
+		pst.setString(1, c.getNombre());
+		pst.setString(2, c.getDni_cliente());
+		pst.setString(3,c.getTelefono());
+		pst.setString(4,c.getEmail());
 		
 		int result = pst.executeUpdate();
 		System.out.println("resultado de insercción: " + result);
@@ -42,10 +42,12 @@ public class ClienteDAOMySQL implements ClienteDAO {
 			String sql = "UPDATE cliente SET nombre=?, dni_cliente=?, telefono=?, email=? WHERE id=?";
 			PreparedStatement pst =conexion.prepareStatement(sql);
 			
-			pst.setString(2, c.getNombre());	
-			pst.setString(3, c.getDni_cliente());
-			pst.setString(4, c.getTelefono());
-			pst.setString(5, c.getEmail());
+			pst.setString(1, c.getNombre());	
+			pst.setString(2, c.getDni_cliente());
+			pst.setString(3, c.getTelefono());
+			pst.setString(4, c.getEmail());
+			//pst.setInt(5, c.getDni_cliente());
+			
 			
 			int result = pst.executeUpdate();
 			System.out.println("resultado de insercción: " + result);
