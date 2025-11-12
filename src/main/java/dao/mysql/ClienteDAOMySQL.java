@@ -38,13 +38,23 @@ public class ClienteDAOMySQL implements ClienteDAO {
 
 	@Override
 	public void update(Cliente c) {
+		try {
+			String sql = "UPDATE cliente SET nombre=?, dni_cliente=?, telefono=?, email=? WHERE id=?";
+			PreparedStatement pst =conexion.prepareStatement(sql);
+			
+			pst.setString(2, c.getNombre());	
+			pst.setString(3, c.getDni_cliente());
+			pst.setString(4, c.getTelefono());
+			pst.setString(5, c.getEmail());
+			
+			int result = pst.executeUpdate();
+			System.out.println("resultado de insercción: " + result);
+			
+			}catch(SQLException e) {
+			System.out.println("No ok" + e.getMessage());
+		}
 		
 		
-		/*UPDATE empleados
-		SET puesto = 'Supervisor',
-		    salario = 3500.00,
-		    estado = 'activo'
-		WHERE id = 3;*/
 		
 	}
 
