@@ -2,6 +2,7 @@ package dao;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
@@ -22,14 +23,17 @@ public class DBConnection {
 	
 			//1.2 Hacer con un FileInputStream
 			Properties props = new Properties();
-			FileInputStream file = new FileInputStream("src\\main\\resources\\conexion.properties");
-			props.load(file);
+			//FileInputStream file = new FileInputStream("src\\main\\resources\\conexion.properties");
+			InputStream input = getClass().getClassLoader().getResourceAsStream("conexion.properties");
+			
+			//props.load(file);
+			props.load(input);
 			dataSource.setUrl(props.getProperty("url"));
 			dataSource.setUser(props.getProperty("user"));
 			dataSource.setPassword(props.getProperty("password"));
 			
-			file.close();
-			
+			//file.close();
+			input.close();
 			
 			//1.4 Main
 			conexionMySQL = dataSource.getConnection();

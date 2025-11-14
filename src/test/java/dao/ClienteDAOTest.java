@@ -16,7 +16,9 @@ class ClienteDAOTest {
 		
 		Cliente cliente1 = new Cliente("Ana", "87654321F", "987654654", "ana@gmail.com");
 		clienteDAO.insert(cliente1);
-		 System.out.println("el cliente " + cliente1.getNombre() + " ha sido insertado");
+		int IdGenerado = cliente1.getId_cliente();
+		
+		 System.out.println("el cliente " + cliente1.getNombre() + " ha sido insertado con el id: " + IdGenerado);
 			
 		
 	}
@@ -26,9 +28,17 @@ class ClienteDAOTest {
 		MySQLDAOFactory factory = new MySQLDAOFactory();
 		ClienteDAOMySQL clienteDAO = (ClienteDAOMySQL) factory.getClienteDAO();
 		
-		Cliente cliente1 = new Cliente("Ana", "87654321F", "987654654", "anaModificado@gmail.com") ;
-		clienteDAO.update(cliente1);
-		 System.out.println("el cliente " + cliente1.getId_cliente() + " ha sido modificado");
+		Cliente cliente2 = new Cliente("Eva", "45236789E", "987654321", "eva@gmail.com") ;
+		clienteDAO.insert(cliente2);
+		int IdGenerado = cliente2.getId_cliente();
+	
+		
+		//Modificacion
+		cliente2.setEmail("evaModificado@gmail.com");
+		clienteDAO.update(cliente2);
+		
+		
+		System.out.println("El cliente: " + cliente2.getNombre() + " con id: " + IdGenerado + " se le han modificado datos" );
 	}
 
 }
