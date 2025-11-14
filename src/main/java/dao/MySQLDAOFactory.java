@@ -1,7 +1,7 @@
 package dao;
 
-import dao.interfaces.ClienteDAO;
-import dao.mysql.ClienteDAOMySQL;
+import dao.interfaces.*;
+import dao.mysql.*;
 
 public class MySQLDAOFactory implements DAOFactory {
 	
@@ -12,5 +12,21 @@ public class MySQLDAOFactory implements DAOFactory {
 		return new ClienteDAOMySQL();
 	}
 
+	@Override
+	public UsuarioDAO getUsuarioDAO() {
+		
+		return new UsuarioDAOMySQL();
+	}
 	
+	@Override
+	public VehiculoDAO getVehiculoDAO() {
+		
+		return new VehiculoDAOMySQL();
+	}
+
+	@Override
+	public ReparacionDAO getReparacionDAO() {
+		
+		return new ReparacionDAOMySQL();
+	}
 }

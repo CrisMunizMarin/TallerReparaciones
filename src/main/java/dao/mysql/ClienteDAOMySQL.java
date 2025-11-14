@@ -78,7 +78,18 @@ public class ClienteDAOMySQL implements ClienteDAO {
 
 	@Override
 	public void delete(String dni) {
-		// TODO Auto-generated method stub
+		try {
+			String sql = "DELETE FROM cliente WHERE dni_cliente=?";
+			PreparedStatement pst =conexion.prepareStatement(sql);
+			
+				
+			int resultado = pst.executeUpdate(sql);
+			
+			
+			
+		}catch(SQLException e) {
+			System.out.println("No ok" + e.getMessage());
+		}
 		
 	}
 

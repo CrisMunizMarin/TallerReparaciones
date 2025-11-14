@@ -1,5 +1,7 @@
 package dao.mysql;
 
-public class VehiculoDAOMySQL {
+import dao.interfaces.VehiculoDAO;
+
+public class VehiculoDAOMySQL implements VehiculoDAO {
 
 }

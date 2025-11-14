@@ -1,6 +1,6 @@
 package entities;
 
-class Usuario {
+public class Usuario {
 	private int id_usuario;
 	private String nombre_usuario;
 	private String dni_usuario;

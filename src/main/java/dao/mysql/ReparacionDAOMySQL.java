@@ -1,5 +1,7 @@
 package dao.mysql;
 
-public class ReparacionDAOMySQL {
+import dao.interfaces.ReparacionDAO;
+
+public class ReparacionDAOMySQL implements ReparacionDAO{
 
 }

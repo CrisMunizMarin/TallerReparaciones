@@ -1,11 +1,17 @@
 package dao;
 
 import dao.interfaces.ClienteDAO;
-import dao.mysql.ClienteDAOMySQL;
+import dao.interfaces.ReparacionDAO;
+import dao.interfaces.UsuarioDAO;
+import dao.interfaces.VehiculoDAO;
+
 
 public interface DAOFactory {
 	public ClienteDAO getClienteDAO();
-	/*public static ClienteDAOMySQL getClienteDAO() {
+	public UsuarioDAO getUsuarioDAO();
+	public VehiculoDAO getVehiculoDAO();
+	public ReparacionDAO getReparacionDAO()
+;	/*public static ClienteDAOMySQL getClienteDAO() {
 		return new ClienteDAOMySQL();
 		
 	}*/
