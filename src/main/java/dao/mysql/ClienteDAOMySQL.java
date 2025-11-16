@@ -71,7 +71,7 @@ public class ClienteDAOMySQL implements ClienteDAO {
 				
 			
 			int result = pst.executeUpdate();
-			System.out.println("resultado de insercción: " + result + " filas afectadas");
+			System.out.println("resultado de la actualización: " + result + " filas afectadas");
 			
 			}catch(SQLException e) {
 			System.out.println("Error en la actualización: " + e.getMessage());

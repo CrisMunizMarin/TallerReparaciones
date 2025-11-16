@@ -88,7 +88,7 @@ class ClienteDAOTest {
 		int conteoFinal = conteoInicial + 2;
 		
 		assertNotNull(listaClientes, "La lista de clientes no debe ser Null");
-		assertEquals(conteoFinal, listaClientes.size(), "El tamaño de la lista no es el esparado");
+		assertEquals(conteoFinal, listaClientes.size(), "El tamaño de la lista no es el esperado");
 		
 		System.out.println("Test findAll ok. El total de clientes de la lista es de: " + listaClientes.size());
 		

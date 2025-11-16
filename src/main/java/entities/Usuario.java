@@ -7,6 +7,15 @@ public class Usuario {
 	private String password;
 	Rol rol;
 	
+	//Contructor para insertar en la BD
+	public Usuario(String nombre_usuario, String dni_usuario, String password, Rol rol) {
+		this.nombre_usuario = nombre_usuario;
+		this.dni_usuario = dni_usuario;
+		this.password = password;
+		this.rol = rol;
+	}
+
+	//Constructor para leer datos de la BD (necesitamos tener tambien el id para poder distinguir a los clientes).
 	public Usuario(int id_usuario, String nombre_usuario, String dni_usuario, String password, Rol rol) {
 		this.id_usuario = id_usuario;
 		this.nombre_usuario = nombre_usuario;
@@ -14,7 +23,9 @@ public class Usuario {
 		this.password = password;
 		this.rol = rol;
 	}
-
+	
+	
+	//Getters y Setters
 	public int getId_usuario() {
 		return id_usuario;
 	}
