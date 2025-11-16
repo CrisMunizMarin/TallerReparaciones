@@ -11,8 +11,5 @@ public interface DAOFactory {
 	public UsuarioDAO getUsuarioDAO();
 	public VehiculoDAO getVehiculoDAO();
 	public ReparacionDAO getReparacionDAO()
-;	/*public static ClienteDAOMySQL getClienteDAO() {
-		return new ClienteDAOMySQL();
-		
-	}*/
+;	
 }

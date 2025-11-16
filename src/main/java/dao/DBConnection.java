@@ -21,21 +21,23 @@ public class DBConnection {
 			MysqlDataSource dataSource = new MysqlDataSource();
 //			
 	
-			//1.2 Hacer con un FileInputStream
+			//1.1 Hacer la conexión buscando con InputStream
 			Properties props = new Properties();
-			//FileInputStream file = new FileInputStream("src\\main\\resources\\conexion.properties");
+			
+			//Esto evita tener que usar rutas absolutas o relativas. Obtiene un cargador de clases y le pide que busque el archivo "conexion.propierties".
+			//Lo busca dentro del paquete compilado dela aplicación y no dentro del disco duro
 			InputStream input = getClass().getClassLoader().getResourceAsStream("conexion.properties");
 			
-			//props.load(file);
 			props.load(input);
+			
 			dataSource.setUrl(props.getProperty("url"));
 			dataSource.setUser(props.getProperty("user"));
 			dataSource.setPassword(props.getProperty("password"));
 			
-			//file.close();
+			
 			input.close();
 			
-			//1.4 Main
+			//1.2 Main
 			conexionMySQL = dataSource.getConnection();
 			System.out.println("Conexion establecida correctamente");
 		}catch(SQLException  |  IOException e) {
@@ -45,7 +47,7 @@ public class DBConnection {
 		
 	}
 	
-	
+	//Creamos la instancia del Singleton de la conexion a la BD
 	public static DBConnection getInstance() {
 		if(instance == null) {
 			instance = new DBConnection();
