@@ -12,7 +12,9 @@ import java.util.ArrayList;
 
 import dao.DBConnection;
 import dao.interfaces.ReparacionDAO;
+import entities.Estado;
 import entities.Reparacion;
+
 
 public class ReparacionDAOMySQL implements ReparacionDAO{
 private Connection conexion;
@@ -46,7 +48,7 @@ private Connection conexion;
 
             // 3. Recuperar la clave generada (id_reparacion)
             
-            try (ResultSet rs = ps.getGeneratedKeys()) {
+            try (ResultSet rs = pst.getGeneratedKeys()) {
                 if (rs.next()) {
                     // Asignamos el ID autogenerado al objeto Reparacion
                     r.setId_reparacion(rs.getInt(1)); 
@@ -104,7 +106,7 @@ private Connection conexion;
 		
 		try (PreparedStatement ps = conexion.prepareStatement(sql)) {
 
-	        // Seteamos el valor del id de la reparación a 1
+	        // Seteamos el valor del id de la reparación a 1 porque es lo que le estoy pidiendo
 	        ps.setInt(1, id_reparacion); 
 	        
 	        // Eliminamos
@@ -135,14 +137,16 @@ private Connection conexion;
 		            // 1. Manejo del FK usuario_id (puede ser NULL)
 		            // Usamos rs.getObject() para recuperar el Integer o null
 		            Integer idUsuario = (Integer) rs.getObject("usuario_id");
+		          //Tenenmos que mapear el campo ENUM estado de la BD(String) a la ENUM de JAVA
+					Estado estadoObtenido = Estado.valueOf(rs.getString("estad").toUpperCase());
 
-		            // 2. Mapeo directo al constructor de Reparacion
+		            // 2. Mapeo el constructor
 		            Reparacion r = new Reparacion(
 		                rs.getInt("id_reparacion"),
 		                rs.getString("descripcion"),
 		                rs.getDate("fecha_entrada"),
 		                rs.getDouble("coste_estimado"),
-		                rs.getString("estado"),
+		                estadoObtenido,
 		                rs.getInt("vehiculo_id"),
 		                idUsuario 
 		            );
@@ -176,6 +180,8 @@ private Connection conexion;
 	                
 	                // Mapeo de la columna opcional (puede ser NULL)
 	                Integer idUsuario = (Integer) rs.getObject("usuario_id");
+	              //Tenenmos que mapear el campo ENUM estado de la BD(String) a la ENUM de JAVA
+					Estado estadoObtenido = Estado.valueOf(rs.getString("estad").toUpperCase());
 
 	                // Mapeo directo al constructor de Reparacion
 	                Reparacion r = new Reparacion(
@@ -183,7 +189,7 @@ private Connection conexion;
 	                    rs.getString("descripcion"),
 	                    rs.getDate("fecha_entrada"),
 	                    rs.getDouble("coste_estimado"),
-	                    rs.getString("estado"),
+	                    estadoObtenido,
 	                    rs.getInt("vehiculo_id"),
 	                    idUsuario 
 	                    

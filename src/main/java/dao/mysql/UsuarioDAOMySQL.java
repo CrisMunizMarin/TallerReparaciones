@@ -153,7 +153,28 @@ private Connection conexion;
 	}
 	
 	//Preguntar por este metodo
-	//boolean login(String dni, String password);
+	public boolean login(String dni, String password) {
+		String sql = "SELECT password FROM usuario WHERE dni_usuario=? ";
+		
+		try(PreparedStatement pst = conexion.prepareStatement(sql)){
+			//Setea en la posición 1 el dni_cliente
+	        pst.setString(1, dni); 
+	       ResultSet rs = pst.executeQuery();
+	        
+	        String pass = rs.getString("password");
+	        if(PasswordUtils.verifyPassword(password, pass)) {
+	        	System.out.println("Contraseña correcta");
+	        	return true;
+	        }else {
+	        	return false;
+	        }
+			
+		}catch(SQLException e) {
+			System.out.println("Error al verificar el usuario" + e.getMessage());
+		}
+		return false;
+		
+	}
 
 	
 
