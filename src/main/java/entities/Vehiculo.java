@@ -1,14 +1,23 @@
 package entities;
 
- class Vehiculo {
+ public class Vehiculo {
 	private int id_vehiculo;
 	private String matricula;
 	private String marca;
 	private String modelo;
 	private int cliente_id;
 	
+	//Este constructor se usa para los metodos findAll y findByMatricula
 	public Vehiculo(int id_vehiculo, String matricula, String marca, String modelo, int cliente_id) {
 		this.id_vehiculo = id_vehiculo;
+		this.matricula = matricula;
+		this.marca = marca;
+		this.modelo = modelo;
+		this.cliente_id = cliente_id;
+	}
+	
+	//Este constructor se usa para la inserccion en la BD(no se necesita id)
+	public Vehiculo(String matricula, String marca, String modelo, int cliente_id) {
 		this.matricula = matricula;
 		this.marca = marca;
 		this.modelo = modelo;
