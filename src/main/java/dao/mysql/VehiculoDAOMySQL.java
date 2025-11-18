@@ -45,6 +45,7 @@ public class VehiculoDAOMySQL implements VehiculoDAO {
         } catch(SQLException e) {
             System.out.println("Error al insertar vehículo: " + e.getMessage());
         }
+        
     		
 	}
 

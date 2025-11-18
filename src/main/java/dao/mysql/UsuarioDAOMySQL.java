@@ -24,6 +24,7 @@ private Connection conexion;
 	public void insert(Usuario u) {
 		String sql = "INSERT INTO usuario(nombre_usuario, dni_usuario, password, rol) VALUES(?,?,?,?);";
 		try(PreparedStatement pst = conexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+			
 			//Debemos obtener la password y hashearla
 			String passwordHasheada = PasswordUtils.hashPassword(u.getPassword());
 			//Seteamos los parametros de la clase Usuario
