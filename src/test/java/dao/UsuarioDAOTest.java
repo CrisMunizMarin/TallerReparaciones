@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import org.junit.jupiter.api.Test;
 
+import dao.Utils.PasswordUtils;
 import dao.mysql.UsuarioDAOMySQL;
 import entities.Rol;
 import entities.Usuario;
@@ -121,5 +122,22 @@ class UsuarioDAOTest {
 		
 		//Limpieza del test (borrar el dni buscado)
 		//usuarioDAO.delete("78743216T");
+	}
+	
+	@Test
+	void testLogin() {
+		 MySQLDAOFactory factory = new MySQLDAOFactory();
+		 UsuarioDAOMySQL usuarioDAO = (UsuarioDAOMySQL) factory.getUsuarioDAO();
+		 
+		 //Inserta un usuario
+		 Usuario usuario6 = new Usuario("usuario6","98765956G", "pass897", Rol.MECANICO);
+		 usuarioDAO.insert(usuario6);
+		 
+		 String dniUsuario = usuario6.getDni_usuario();
+		 
+		 //Asercciones 
+		 assertTrue(usuarioDAO.login(dniUsuario,"pass897"), "Error: la password no coincide");
+		 System.out.println("Test login ok. La password coincide");
+		 
 	}
 }

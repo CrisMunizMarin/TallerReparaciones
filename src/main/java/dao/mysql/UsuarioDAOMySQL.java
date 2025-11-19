@@ -152,7 +152,7 @@ private Connection conexion;
 		return u;
 	}
 	
-	//Preguntar por este metodo
+	//Preguntar por este metodo. Este metodo solo se encarga de verificar que el suuario tiene una cuenta en la aplicación
 	public boolean login(String dni, String password) {
 		String sql = "SELECT password FROM usuario WHERE dni_usuario=? ";
 		
@@ -161,12 +161,15 @@ private Connection conexion;
 	        pst.setString(1, dni); 
 	       ResultSet rs = pst.executeQuery();
 	        
-	        String pass = rs.getString("password");
-	        if(PasswordUtils.verifyPassword(password, pass)) {
-	        	System.out.println("Contraseña correcta");
-	        	return true;
-	        }else {
-	        	return false;
+	        
+	        if (rs.next()) { // Avanza a la primera fila
+	            String pass = rs.getString("password");
+		        if(PasswordUtils.verifyPassword(password, pass)) {
+		        	System.out.println("Contraseña correcta");
+		        	return true;
+		        }else {
+		        	return false;
+		        }
 	        }
 			
 		}catch(SQLException e) {
