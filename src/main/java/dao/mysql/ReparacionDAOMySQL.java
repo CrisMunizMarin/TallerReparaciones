@@ -26,7 +26,7 @@ private Connection conexion;
 	@Override
 	public void insert(Reparacion r) {
 		//No incluimos la ENUM estado porque tiene un valor por defecto
-		String sql = "INSERT INTO reparacion (descripcion, fecha_entrada, coste_estimado, vehiculo_id, usuario_id) VALUES (?, ?, ?, ?, ?)";
+		String sql = "INSERT INTO reparacion (descripcion, fecha_entrada, coste_estimado,estado, vehiculo_id, usuario_id) VALUES (?, ?, ?, ?, ?, ?)";
 		
         try (PreparedStatement pst = conexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
@@ -34,13 +34,14 @@ private Connection conexion;
             pst.setString(1, r.getDescripcion());
             pst.setDate(2, r.getFecha_entrada()); 
             pst.setDouble(3, r.getCoste_estimado());
-            pst.setInt(4, r.getVehiculo_id());
+            pst.setString(4, r.getEstado().toString().toUpperCase());
+            pst.setInt(5, r.getVehiculo_id());
             
             //Como el suaurio puede ser null, debemos manejarlo
             if(r.getUsuario_id() != null) {
-            	pst.setInt(5, r.getUsuario_id());
+            	pst.setInt(6, r.getUsuario_id());
             }else {
-            	pst.setObject(5, null);
+            	pst.setObject(6, null);
             }
             
             //Ejecutar la inserción
@@ -57,7 +58,7 @@ private Connection conexion;
 
         } catch (SQLException e) {
             System.out.println("Error al insertar reparación." + e.getMessage());
-            
+            e.printStackTrace();
         }
 		
 	}
@@ -68,7 +69,7 @@ private Connection conexion;
 		
 		try (PreparedStatement pst = conexion.prepareStatement(sql)) {
 
-	        // 1. Asignar los valores a los campos (SET)
+	        //Setear campos
 	        pst.setString(1, r.getDescripcion());
 	        pst.setDate(2, r.getFecha_entrada()); 
 	        pst.setDouble(3, r.getCoste_estimado());
@@ -86,10 +87,10 @@ private Connection conexion;
 	        
 	        pst.setInt(7, r.getId_reparacion()); //WHERE
 	        
-	        //Actualizacion
-	        int filasAfectadas = pst.executeUpdate();
+	        //Obtenemos los resultados  y los comprobamos
+	        int result = pst.executeUpdate();
 	        
-	        if (filasAfectadas == 0) {
+	        if (result == 0) {
 	            System.out.println("ERROR: No se encontró la reparación con ID " + r.getId_reparacion() + " para actualizar.");
 	        }
 
@@ -109,10 +110,10 @@ private Connection conexion;
 	        // Seteamos el valor del id de la reparación a 1 porque es lo que le estoy pidiendo
 	        ps.setInt(1, id_reparacion); 
 	        
-	        // Eliminamos
-	        int filasAfectadas = ps.executeUpdate();
+	        // 
+	        int result = ps.executeUpdate();
 	        
-	        if (filasAfectadas == 0) {
+	        if (result == 0) {
 	            System.out.println("ERROR: No se encontró la reparación con ID " + id_reparacion + " para eliminar.");
 	        } else {
 	            System.out.println("Reparación con ID " + id_reparacion + " eliminada correctamente.");
@@ -138,7 +139,7 @@ private Connection conexion;
 		            // Usamos rs.getObject() para recuperar el Integer o null
 		            Integer idUsuario = (Integer) rs.getObject("usuario_id");
 		          //Tenenmos que mapear el campo ENUM estado de la BD(String) a la ENUM de JAVA
-					Estado estadoObtenido = Estado.valueOf(rs.getString("estad").toUpperCase());
+					Estado estadoObtenido = Estado.valueOf(rs.getString("estado").toUpperCase());
 
 		            // 2. Mapeo el constructor
 		            Reparacion r = new Reparacion(
@@ -181,7 +182,7 @@ private Connection conexion;
 	                // Mapeo de la columna opcional (puede ser NULL)
 	                Integer idUsuario = (Integer) rs.getObject("usuario_id");
 	              //Tenenmos que mapear el campo ENUM estado de la BD(String) a la ENUM de JAVA
-					Estado estadoObtenido = Estado.valueOf(rs.getString("estad").toUpperCase());
+					Estado estadoObtenido = Estado.valueOf(rs.getString("estado").toUpperCase());
 
 	                // Mapeo directo al constructor de Reparacion
 	                Reparacion r = new Reparacion(
@@ -197,7 +198,7 @@ private Connection conexion;
 	                
 	                listaReparacionesVehiculo.add(r);
 	            }
-	        } // rs se cierra automáticamente
+	        } 
 
 	    } catch (SQLException e) {
 	        System.out.println("Error al buscar reparaciones por ID de vehículo: " + id_vehiculo + e.getMessage());
