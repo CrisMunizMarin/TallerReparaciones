@@ -152,30 +152,44 @@ private Connection conexion;
 		return u;
 	}
 	
-	//Preguntar por este metodo. Este metodo solo se encarga de verificar que el suuario tiene una cuenta en la aplicación
-	public boolean login(String dni, String password) {
-		String sql = "SELECT password FROM usuario WHERE dni_usuario=? ";
+	/*Preguntar por este metodo. Este metodo solo se encarga de verificar que el usuario tiene una cuenta 
+	 * en la aplicación y de ser así te devuelve el usuario logueado
+	 */
+	public Usuario login(String dni, String password) {
+		String sql = "SELECT id_usuario, nombre_usuario, dni_usuario, password, rol FROM usuario WHERE dni_usuario=? ";
+		Usuario u = null;
 		
 		try(PreparedStatement pst = conexion.prepareStatement(sql)){
 			//Setea en la posición 1 el dni_cliente
 	        pst.setString(1, dni); 
-	       ResultSet rs = pst.executeQuery();
+	       try(ResultSet rs = pst.executeQuery()){
 	        
 	        
-	        if (rs.next()) { // Avanza a la primera fila
-	            String pass = rs.getString("password");
-		        if(PasswordUtils.verifyPassword(password, pass)) {
-		        	System.out.println("Contraseña correcta");
-		        	return true;
-		        }else {
-		        	return false;
+		        if (rs.next()) { 
+		        	//Mapeamos el usuari y luego verificamos su contraseña
+		        	Rol rolObtenido = Rol.valueOf(rs.getString("rol").toUpperCase());
+		            String passHash = rs.getString("password");
+		            
+		            u = new Usuario (
+		            		rs.getInt("id_usuario"),
+		                     rs.getString("nombre_usuario"),
+		                     rs.getString("dni_usuario"),
+		                     passHash, // Guardamos el hash
+		                     rolObtenido
+		            		);
+		        
+			        if(PasswordUtils.verifyPassword(password, passHash)) {
+			        	System.out.println("Contraseña correcta");
+			        	return u;
+			        }
 		        }
-	        }
-			
+	       }
 		}catch(SQLException e) {
 			System.out.println("Error al verificar el usuario" + e.getMessage());
 		}
-		return false;
+		
+		//Si  no se encuentra el usuario o la contraseña falló
+		return null;
 		
 	}
 
