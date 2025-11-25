@@ -158,7 +158,36 @@ public class ClienteDAOMySQL implements ClienteDAO {
 		}
 		return c;
 	}
-	
+
+	//Añadimos este metodo por que lo necesitaremos para gestionar los clientes (CU5)
+	@Override
+	public Cliente findById(int id_cliente) {
+		String sql = "SELECT id_cliente, nombre, dni_cliente, telefono, email FROM cliente WHERE id_cliente = ?";
+	    Cliente c = null;
+
+	    // Asumimos que la conexión es una variable de clase llamada 'conexion' o la obtienes aquí
+	    try (PreparedStatement pst = conexion.prepareStatement(sql)) {
+
+	        pst.setInt(1, id_cliente); 
+
+	        try (ResultSet rs = pst.executeQuery()) {
+	            
+	            if (rs.next()) {
+	                // Mapeo al constructor completo de Cliente
+	                c = new Cliente(
+	                    rs.getInt("id_cliente"),
+	                    rs.getString("nombre"),
+	                    rs.getString("dni_cliente"),
+	                    rs.getString("telefono"),
+	                    rs.getString("email")
+	                );
+	            }
+	        } 
+	    } catch (SQLException e) {
+	        System.err.println("Error al buscar cliente por ID: " + e.getMessage());
+	    }
+	    return c;
+	}
 	
 
 }
