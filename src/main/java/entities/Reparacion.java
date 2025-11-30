@@ -8,17 +8,15 @@ public class Reparacion {
 	 private Date fecha_entrada;
 	 private double coste_estimado;
 	 Estado estado;
-	 private Date fecha_salida;
 	 private int vehiculo_id;
 	 private Integer usuario_id;
 	 
 	 //Constructor para las insercciones sin ID
-	 public Reparacion(String descripcion, Date fecha_entrada, double coste_estimado, Estado estado, Date fecha_salida, int vehiculo_id, Integer usuario_id ) {
+	 public Reparacion(String descripcion, Date fecha_entrada, double coste_estimado, Estado estado, int vehiculo_id, Integer usuario_id ) {
 		 this.descripcion = descripcion;
 		 this.fecha_entrada = fecha_entrada;
 		 this.coste_estimado = coste_estimado;
 		 this.estado = estado;
-		 this.fecha_salida = fecha_salida;
 		 this.vehiculo_id = vehiculo_id;
 		 this.usuario_id = usuario_id;
 		 
@@ -26,13 +24,12 @@ public class Reparacion {
 	 }
 	 
 	 //cosntructor para las busquedas con ID
-	 public Reparacion(int id_reparacion, String descripcion, Date fecha_entrada, double coste_estimado, Estado estado, Date fecha_salida, int vehiculo_id, Integer usuario_id) {
+	 public Reparacion(int id_reparacion, String descripcion, Date fecha_entrada, double coste_estimado, Estado estado, int vehiculo_id, Integer usuario_id) {
 		this.id_reparacion = id_reparacion;
 		this.descripcion = descripcion;
 		this.fecha_entrada = fecha_entrada;
 		this.coste_estimado = coste_estimado;
 		this.estado = estado;
-		this.fecha_salida = fecha_salida;
 		this.vehiculo_id = vehiculo_id;
 		this.usuario_id = usuario_id;
 	}
@@ -78,13 +75,7 @@ public class Reparacion {
 		 this.estado = estado;
 	 }
 	 
-	 public Date getFecha_salida() {
-		 return fecha_salida;
-	 }
-
-	 public void setFecha_salida(Date fecha_salida) {
-		 this.fecha_salida = fecha_salida;
-	 }
+	
 	 public int getVehiculo_id() {
 		 return vehiculo_id;
 	 }

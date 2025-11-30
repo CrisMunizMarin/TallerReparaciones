@@ -165,7 +165,7 @@ public class ClienteDAOMySQL implements ClienteDAO {
 		String sql = "SELECT id_cliente, nombre, dni_cliente, telefono, email FROM cliente WHERE id_cliente = ?";
 	    Cliente c = null;
 
-	    // Asumimos que la conexión es una variable de clase llamada 'conexion' o la obtienes aquí
+	    
 	    try (PreparedStatement pst = conexion.prepareStatement(sql)) {
 
 	        pst.setInt(1, id_cliente); 

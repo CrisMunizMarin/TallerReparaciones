@@ -10,4 +10,5 @@ public interface ReparacionDAO {
 	ArrayList<Reparacion> findAll();
 	ArrayList<Reparacion> findByVehiculoId(int id_vehiculo);
 	Reparacion findById(int id_reparacion);
+	ArrayList<Reparacion> findByMatricula(String matricula);
 }

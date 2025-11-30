@@ -17,4 +17,8 @@ public interface UsuarioDAO {
 
 	Usuario findByNombre(String nombre_usuario);
 
+	Usuario findByDni(String dni_usuario);
+
+	boolean login(String dni_usuario, String password);
+
 }

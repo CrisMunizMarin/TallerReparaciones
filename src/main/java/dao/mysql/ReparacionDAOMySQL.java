@@ -26,7 +26,7 @@ private Connection conexion;
 	@Override
 	public void insert(Reparacion r) {
 		//No incluimos la ENUM estado porque tiene un valor por defecto
-		String sql = "INSERT INTO reparacion (descripcion, fecha_entrada, coste_estimado, estado, fecha_salida, vehiculo_id, usuario_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
+		String sql = "INSERT INTO reparacion (descripcion, fecha_entrada, coste_estimado, estado, vehiculo_id, usuario_id) VALUES (?, ?, ?, ?, ?, ?)";
 		
         try (PreparedStatement pst = conexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
@@ -35,23 +35,14 @@ private Connection conexion;
             pst.setDate(2, r.getFecha_entrada()); 
             pst.setDouble(3, r.getCoste_estimado());
             pst.setString(4, r.getEstado().toString().toUpperCase());
-            
-          //Como la fecha de salida es null hay que manejarla
-            if(r.getFecha_salida() != null) {
-                pst.setDate(5, r.getFecha_salida());
-            } else {
-                // Si la fecha es null el ponemos null explicito
-                pst.setObject(5, null); 
-            } 
-            
-            pst.setInt(6, r.getVehiculo_id());
+            pst.setInt(5, r.getVehiculo_id());
        
        
             //Como el suaurio puede ser null, debemos manejarlo
             if(r.getUsuario_id() != null) {
-            	pst.setInt(7, r.getUsuario_id());
+            	pst.setInt(6, r.getUsuario_id());
             }else {
-            	pst.setObject(7, null);
+            	pst.setObject(6, null);
             }
             
             //Ejecutar la inserción
@@ -75,7 +66,7 @@ private Connection conexion;
 
 	@Override
 	public void update(Reparacion r) {
-		String sql= "UPDATE reparacion SET descripcion=?, fecha_entrada=?, coste_estimado=?, estado=?, fecha_salida=?, vehiculo_id=?, usuario_id=? WHERE id_reparacion=?";
+		String sql= "UPDATE reparacion SET descripcion=?, fecha_entrada=?, coste_estimado=?, estado=?, vehiculo_id=?, usuario_id=? WHERE id_reparacion=?";
 		
 		try (PreparedStatement pst = conexion.prepareStatement(sql)) {
 
@@ -84,27 +75,18 @@ private Connection conexion;
 	        pst.setDate(2, r.getFecha_entrada()); 
 	        pst.setDouble(3, r.getCoste_estimado());
 	        pst.setString(4,r.getEstado().toString().toUpperCase());
-	        
-	        //Como la fecha de salida es null hay que manejarla
-            if(r.getFecha_salida() != null) {
-                pst.setDate(5, r.getFecha_salida());
-            } else {
-                // Si la fecha es null el ponemos null explicito
-                pst.setObject(5, null); 
-            } 
-            
-	        pst.setInt(6, r.getVehiculo_id());
+	        pst.setInt(5, r.getVehiculo_id());
 	        
 	        // 2. Manejo de la FK usuario_id (puede ser NULL)
 	        if (r.getUsuario_id() != null) {
-	            pst.setInt(7, r.getUsuario_id()); 
+	            pst.setInt(6, r.getUsuario_id()); 
 	        } else {
 	            // Si el mecánico se desasigna, ponemos NULL
-	            pst.setObject(7, null); 
+	            pst.setObject(6, null); 
 	        }
 
 	        
-	        pst.setInt(8, r.getId_reparacion()); //WHERE
+	        pst.setInt(7, r.getId_reparacion()); //WHERE
 	        
 	        //Obtenemos los resultados  y los comprobamos
 	        int result = pst.executeUpdate();
@@ -148,7 +130,7 @@ private Connection conexion;
 	public ArrayList<Reparacion> findAll() {
 		ArrayList<Reparacion> listaReparaciones = new ArrayList<>();
 		
-		String sql = "SELECT id_reparacion, descripcion, fecha_entrada, coste_estimado, estado,fecha_salida, vehiculo_id, usuario_id FROM reparacion";
+		String sql = "SELECT id_reparacion, descripcion, fecha_entrada, coste_estimado, estado, vehiculo_id, usuario_id FROM reparacion";
 		try (PreparedStatement pst = conexion.prepareStatement(sql); ResultSet rs = pst.executeQuery()) {
 
 		        // Recorremos cada fila del resultado
@@ -159,8 +141,7 @@ private Connection conexion;
 		            Integer idUsuario = (Integer) rs.getObject("usuario_id");
 		          //Tenenmos que mapear el campo ENUM estado de la BD(String) a la ENUM de JAVA
 					Estado estadoObtenido = Estado.valueOf(rs.getString("estado").toUpperCase());
-					//  Mapeo del campo fecha_salida
-		            java.sql.Date fechaSalida = rs.getDate("fecha_salida");
+					
 
 		            // 2. Mapeo el constructor
 		            Reparacion r = new Reparacion(
@@ -169,7 +150,6 @@ private Connection conexion;
 		                rs.getDate("fecha_entrada"),
 		                rs.getDouble("coste_estimado"),
 		                estadoObtenido,
-		                fechaSalida,
 		                rs.getInt("vehiculo_id"),
 		                idUsuario 
 		            );
@@ -188,7 +168,7 @@ private Connection conexion;
 	@Override
 	public ArrayList<Reparacion> findByVehiculoId(int id_vehiculo) {
 		ArrayList<Reparacion> listaReparacionesVehiculo = new ArrayList<>();
-		String sql = "SELECT id_reparacion, descripcion, fecha_entrada, coste_estimado, estado,fecha_salida, vehiculo_id, usuario_id FROM reparacion WHERE vehiculo_id = ?";
+		String sql = "SELECT id_reparacion, descripcion, fecha_entrada, coste_estimado, estado, vehiculo_id, usuario_id FROM reparacion WHERE vehiculo_id = ?";
 		
 		try (PreparedStatement pst = conexion.prepareStatement(sql)) {
 	        
@@ -205,8 +185,7 @@ private Connection conexion;
 	                Integer idUsuario = (Integer) rs.getObject("usuario_id");
 	              //Tenenmos que mapear el campo ENUM estado de la BD(String) a la ENUM de JAVA
 					Estado estadoObtenido = Estado.valueOf(rs.getString("estado").toUpperCase());
-				//  Mapeo del campo fecha_salida
-		            java.sql.Date fechaSalida = rs.getDate("fecha_salida");
+				
 
 	                // Mapeo directo al constructor de Reparacion
 	                Reparacion r = new Reparacion(
@@ -215,7 +194,6 @@ private Connection conexion;
 	                    rs.getDate("fecha_entrada"),
 	                    rs.getDouble("coste_estimado"),
 	                    estadoObtenido,
-	                    fechaSalida,
 	                    rs.getInt("vehiculo_id"),
 	                    idUsuario 
 	                    
@@ -236,7 +214,7 @@ private Connection conexion;
 	//Este metodos se crea porque necesitamos encontrar la reparacion para poder actualizar su estado
 	@Override
 	public Reparacion findById(int id_reparacion) {
-		String sql = "SELECT id_reparacion, descripcion, fecha_entrada, coste_estimado, estado,fecha_salida, vehiculo_id, usuario_id FROM reparacion WHERE id_reparacion = ?";
+		String sql = "SELECT id_reparacion, descripcion, fecha_entrada, coste_estimado, estado, vehiculo_id, usuario_id FROM reparacion WHERE id_reparacion = ?";
 	    Reparacion r = null; 
 
 	    try (PreparedStatement pst = conexion.prepareStatement(sql)) {
@@ -249,7 +227,7 @@ private Connection conexion;
 	                // Mapeamos el usuario, el estado y la fecha
 	                Integer idUsuario = (Integer) rs.getObject("usuario_id");
 	                Estado estadoObtenido = Estado.valueOf(rs.getString("estado").toUpperCase());
-	                java.sql.Date fechaSalida = rs.getDate("fecha_salida");
+	                
 	                
 	                //Preparamos el objeto
 	                r = new Reparacion(
@@ -258,7 +236,6 @@ private Connection conexion;
 	                    rs.getDate("fecha_entrada"),
 	                    rs.getDouble("coste_estimado"),
 	                    estadoObtenido,
-	                    fechaSalida,
 	                    rs.getInt("vehiculo_id"),
 	                    idUsuario 
 	                );
@@ -269,6 +246,72 @@ private Connection conexion;
 	        System.out.println("Error al buscar reparación por ID: " + id_reparacion + e.getMessage());
 	    }
 	    return r; // Devuelve el objeto r (reparacion)
+	}
+	
+	
+	//Metodos extra para poder hacer los CUs
+	//Crear array con las reparaciones que tengan esado de finalizadas
+	public ArrayList<Reparacion> repFinalizadas(){
+		ArrayList<Reparacion> listaReparaciones = findAll();
+		ArrayList<Reparacion> listaFinalizadas = new ArrayList<>();
+		
+		for(Reparacion rep : listaReparaciones) {
+			if(rep.getEstado() == Estado.FINALIZADO) {
+				listaFinalizadas.add(rep);
+			}
+		}
+		
+		return listaFinalizadas;
+	}
+	
+	
+	//Encontar reparación por la matricula de un coche
+	
+	@Override
+	public ArrayList<Reparacion> findByMatricula(String matricula) {
+		ArrayList<Reparacion> listaVehiculosMatricula= new ArrayList<>();
+		String sql = "SELECT r.* FROM reparacion r \n"
+				+ "JOIN vehiculo v ON r.vehiculo_id = v.id_vehiculo \n"
+				+ "WHERE v.matricula = ?";
+		
+		try (PreparedStatement pst = conexion.prepareStatement(sql)) {
+	        
+	        // Setear el parámetro de búsqueda
+	        pst.setString(1, matricula);
+	        
+	        
+	        try (ResultSet rs = pst.executeQuery()) {
+	            
+	            // Recorremos cada reparación encontrada
+	            while (rs.next()) {
+	                
+	                // Mapeo de la columna opcional (puede ser NULL)
+	                Integer idUsuario = (Integer) rs.getObject("usuario_id");
+	              //Tenenmos que mapear el campo ENUM estado de la BD(String) a la ENUM de JAVA
+					Estado estadoObtenido = Estado.valueOf(rs.getString("estado").toUpperCase());
+				
+
+	                // Mapeo directo al constructor de Reparacion
+	                Reparacion r = new Reparacion(
+	                    rs.getInt("id_reparacion"),
+	                    rs.getString("descripcion"),
+	                    rs.getDate("fecha_entrada"),
+	                    rs.getDouble("coste_estimado"),
+	                    estadoObtenido,
+	                    rs.getInt("vehiculo_id"),
+	                    idUsuario 
+	                    
+	                );
+	                
+	                listaVehiculosMatricula.add(r);
+	            }
+	        } 
+
+	    } catch (SQLException e) {
+	        System.out.println("Error al buscar reparaciones por matricula: " + matricula + e.getMessage());
+	       
+	    }
+	    return listaVehiculosMatricula;
 	}
 
 }

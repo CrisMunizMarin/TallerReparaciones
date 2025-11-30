@@ -152,45 +152,72 @@ private Connection conexion;
 		return u;
 	}
 	
-	/*Preguntar por este metodo. Este metodo solo se encarga de verificar que el usuario tiene una cuenta 
-	 * en la aplicación y de ser así te devuelve el usuario logueado
+	/* Este metodo solo se encarga de verificar que el usuario tiene una cuenta 
+	 * en la aplicación y de ser así te devuelve un correcto o incorrecto
 	 */
-	public Usuario login(String dni, String password) {
-		String sql = "SELECT id_usuario, nombre_usuario, dni_usuario, password, rol FROM usuario WHERE dni_usuario=? ";
-		Usuario u = null;
+	
+	@Override
+	public boolean login(String dni_usuario, String password) {
+		String sql = "SELECT password FROM usuario WHERE dni_usuario=? ";
+		
 		
 		try(PreparedStatement pst = conexion.prepareStatement(sql)){
 			//Setea en la posición 1 el dni_cliente
-	        pst.setString(1, dni); 
-	       try(ResultSet rs = pst.executeQuery()){
+	        pst.setString(1, dni_usuario); 
+	       ResultSet rs = pst.executeQuery();
 	        
 	        
-		        if (rs.next()) { 
-		        	//Mapeamos el usuari y luego verificamos su contraseña
-		        	Rol rolObtenido = Rol.valueOf(rs.getString("rol").toUpperCase());
-		            String passHash = rs.getString("password");
-		            
-		            u = new Usuario (
-		            		rs.getInt("id_usuario"),
-		                     rs.getString("nombre_usuario"),
-		                     rs.getString("dni_usuario"),
-		                     passHash, // Guardamos el hash
-		                     rolObtenido
-		            		);
-		        
-			        if(PasswordUtils.verifyPassword(password, passHash)) {
-			        	System.out.println("Contraseña correcta");
-			        	return u;
-			        }
+		        if (!rs.next()) { 
+		        	return false;
 		        }
-	       }
+		        	
+		        String passHash = rs.getString("password");
+		        
+			    if(PasswordUtils.verifyPassword(password, passHash)) {
+			        System.out.println("Contraseña correcta");
+			        return true;
+			     }else {
+			    	 System.out.println("Contraseña incorrecta");
+				        return false;
+			     }
+		       
+	       
 		}catch(SQLException e) {
-			System.out.println("Error al verificar el usuario" + e.getMessage());
+			System.out.println("Error al verificar la contraseña del usuario" + e.getMessage());
+			return false;
 		}
+	
+	}
+	
+	
+	//Metodo auxiliar para trabajar con el login en el menu
+	
+	@Override
+	public Usuario findByDni(String dni_usuario) {
+		String sql ="SELECT id_usuario, nombre_usuario, dni_usuario, password, rol FROM usuario WHERE dni_usuario= ?";
+		//Creamos el Usuario con valor null por si no lo encuentra en la BD
+		Usuario u = null;
 		
-		//Si  no se encuentra el usuario o la contraseña falló
-		return null;
-		
+		try(PreparedStatement pst = conexion.prepareStatement(sql)){
+			pst.setString(1, dni_usuario);
+			try(ResultSet rs = pst.executeQuery()){
+				if (rs.next()) {
+					//Mapeamos el campo rol de la ENUM
+					Rol rolObtenido = Rol.valueOf(rs.getString("rol").toUpperCase());
+	                // Mapeo de datos del ResultSet al objeto Cliente
+	                 	u = new Usuario(
+	                 			rs.getInt("id_usuario"),
+	                            rs.getString("nombre_usuario"),
+	                            rs.getString("dni_usuario"),
+	                            rs.getString("password"),
+	                            rolObtenido
+	                );
+	            }
+			}
+		}catch(SQLException e){
+			System.out.println("Error al encontar el usuario por su nombre: " + e.getMessage());
+		}
+		return u;
 	}
 
 	
