@@ -2,26 +2,40 @@ package entities;
 
 import java.sql.Date;
 
-class Reparacion {
+public class Reparacion {
 	 private int id_reparacion;
 	 private String descripcion;
 	 private Date fecha_entrada;
 	 private double coste_estimado;
 	 Estado estado;
 	 private int vehiculo_id;
-	 private int usuario_id;
+	 private Integer usuario_id;
 	 
-	 public Reparacion(int id_reparacion, String descripcion, Date fecha_entrada, double coste_estimado, Estado estado ) {
-		 this.id_reparacion = id_reparacion;
+	 //Constructor para las insercciones sin ID
+	 public Reparacion(String descripcion, Date fecha_entrada, double coste_estimado, Estado estado, int vehiculo_id, Integer usuario_id ) {
 		 this.descripcion = descripcion;
 		 this.fecha_entrada = fecha_entrada;
 		 this.coste_estimado = coste_estimado;
 		 this.estado = estado;
+		 this.vehiculo_id = vehiculo_id;
+		 this.usuario_id = usuario_id;
 		 
 		 
 	 }
+	 
+	 //cosntructor para las busquedas con ID
+	 public Reparacion(int id_reparacion, String descripcion, Date fecha_entrada, double coste_estimado, Estado estado, int vehiculo_id, Integer usuario_id) {
+		this.id_reparacion = id_reparacion;
+		this.descripcion = descripcion;
+		this.fecha_entrada = fecha_entrada;
+		this.coste_estimado = coste_estimado;
+		this.estado = estado;
+		this.vehiculo_id = vehiculo_id;
+		this.usuario_id = usuario_id;
+	}
 
-	 public int getId_reparacion() {
+	 //Getters y Setters
+	public int getId_reparacion() {
 		 return id_reparacion;
 	 }
 
@@ -60,7 +74,8 @@ class Reparacion {
 	 public void setEstado(Estado estado) {
 		 this.estado = estado;
 	 }
-
+	 
+	
 	 public int getVehiculo_id() {
 		 return vehiculo_id;
 	 }
@@ -69,11 +84,11 @@ class Reparacion {
 		 this.vehiculo_id = vehiculo_id;
 	 }
 
-	 public int getUsuario_id() {
+	 public Integer getUsuario_id() {
 		 return usuario_id;
 	 }
 
-	 public void setUsuario_id(int usuario_id) {
+	 public void setUsuario_id(Integer usuario_id) {
 		 this.usuario_id = usuario_id;
 	 }
 	 
