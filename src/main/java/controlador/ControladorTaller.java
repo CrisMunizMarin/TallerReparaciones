@@ -9,6 +9,10 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+/**
+ * Controlador principal del Taller. Implementa el patrón Singleton.
+ * Contiene la lógica de negocio y coordina las operaciones con las capas DAO.
+ */
 public class ControladorTaller {
 	//Debemos crear un SINGLETON
 	private static ControladorTaller instance;
@@ -18,21 +22,19 @@ public class ControladorTaller {
 	
 	//Creamos el scanner 
 	Scanner entrada = new Scanner(System.in);
-	
-	
-	//Acceso (llamamos a la instancia creada del controlador taller)
-	public static ControladorTaller getInstance() {
-        return instance;
-    }
-	
-
-    public static void inicio(VehiculoDAOMySQL daoVehiculo, ClienteDAOMySQL daoCliente,
-                            UsuarioDAOMySQL daoUsuario, ReparacionDAOMySQL daoReparacion) {
-        instance = new ControladorTaller(daoVehiculo, daoCliente, daoUsuario, daoReparacion);
-    }
+	// Atributos para las capas de acceso a datos (DAO) - Inyección de dependencias
+	private VehiculoDAOMySQL vehiculoDAO;
+    private ClienteDAOMySQL clienteDAO;
+    private UsuarioDAOMySQL usuarioDAO;
+    private ReparacionDAOMySQL reparacionDAO;
     
-    
-    //Constructor del Singleton
+    /**
+     * Constructor privado para forzar el uso del patrón Singleton.
+     * @param v DAO de Vehículos
+     * @param c DAO de Clientes
+     * @param u DAO de Usuarios
+     * @param r DAO de Reparaciones
+     */
     private ControladorTaller(VehiculoDAOMySQL v, ClienteDAOMySQL c,
                               UsuarioDAOMySQL u, ReparacionDAOMySQL r) {
         vehiculoDAO = v;
@@ -40,32 +42,54 @@ public class ControladorTaller {
         usuarioDAO = u;
         reparacionDAO = r;
     }
-
-    private VehiculoDAOMySQL vehiculoDAO;
-    private ClienteDAOMySQL clienteDAO;
-    private UsuarioDAOMySQL usuarioDAO;
-    private ReparacionDAOMySQL reparacionDAO;
-	
+    
+    /**
+     * Método de inicialización estático para el Singleton.
+     * Debe llamarse una sola vez al inicio de la aplicación.
+     */
+    public static void inicio(VehiculoDAOMySQL daoVehiculo, ClienteDAOMySQL daoCliente,
+            UsuarioDAOMySQL daoUsuario, ReparacionDAOMySQL daoReparacion) {
+    		instance = new ControladorTaller(daoVehiculo, daoCliente, daoUsuario, daoReparacion);
+    }
+    
+    /**
+     * Acceso a la instancia del Singleton.
+     * @return La única instancia del ControladorTaller.
+     */
+  	public static ControladorTaller getInstance() {
+          return instance;
+      }
 	
 	
 	//IMPLEMANTAMOS LA LOGICA DE NEGOCIO (RELATIVAS A LOS CASOS DE USO)
 	
 	//CU1 Ver reparaciones finalizadas (Invitado)
-    public void visualizarReparacionesFinalizadas() {
+  	/**
+	 * Recupera todas las reparaciones finalizadas y las visualiza directamente en la consola.
+	 * @return El array con la lista de reparaciones finalizadas
+	 */
+    public ArrayList<Reparacion> visualizarReparacionesFinalizadas() {
     	ArrayList<Reparacion> listaReparaciones = reparacionDAO.repFinalizadas();
     	
-    	if(listaReparaciones.isEmpty()) {
-    		System.out.println("No se han encontrado reparaciones finalizadas.");
-    		return;
-    	}
     	
     	System.out.println("\n*** LISTADO DE REPARACIONES FINALIZADAS ***");
     	for(Reparacion rep : listaReparaciones) {
-    		System.out.println(rep.toString());
+    		System.out.println(" Id: " + rep.getId_reparacion() + 
+                    "\nDescripción: " + rep.getDescripcion() + 
+                    "\nFecha entrada: " + rep.getFecha_entrada() + 
+                    "\nCoste estimado: " + rep.getCoste_estimado());
     	}
+    	return listaReparaciones;
     }
     
     //CU2 Login 
+    /**
+ 	 * Intenta autenticar un usuario con el DNI y la contraseña proporcionados.
+ 	 * Si la autenticación es exitosa, establece el usuario como activo.
+ 	 * @param dni DNI del usuario.
+ 	 * @param pass Contraseña del usuario.
+ 	 * @return El objeto Usuario si el login es correcto, o  null si falla la verificación.
+ 	 */
     public Usuario login(String dni, String pass) {
         // Se comprueba que la contraseña es correcta en base al usuario. 
        boolean verificacion = usuarioDAO.login(dni, pass);
@@ -75,16 +99,21 @@ public class ControladorTaller {
         }
 
         Usuario u = usuarioDAO.findByDni(dni);
-        usuarioActivo = u; // Guardamos el usuario activo
+        this.usuarioActivo = u; // Guardamos el usuario activo
         return u;
     }
+
     
     
     //CU3 Registrar reparacion (Mecanico y Administrador)
     /**
-     * Registra una nueva reparación pidiendo datos por consola y asociandola
-     * al usuario que la registra
-     * @param */
+ 	 * Registra una nueva reparación con estado PENDIENTE, asociándola a un vehículo y al usuario que la registra.
+ 	 * @param matricula Matrícula del vehículo asociado.
+ 	 * @param descripcion Descripción de la avería.
+ 	 * @param fecha_entrada Fecha de entrada en formato de cadena (asumiendo "YYYY-MM-DD").
+ 	 * @param coste_estimado Coste estimado inicial.
+ 	 * @param dni_usuario DNI del usuario que registra la reparación.
+ 	 */
     public void registrarReparacion(String matricula, String descripcion, String fecha_entrada, double coste_estimado, String dni_usuario) {
         System.out.println("\n*** REGISTRAR NUEVA REPARACIÓN ***");
 
@@ -112,8 +141,11 @@ public class ControladorTaller {
     
     //CU4 Cambiar estado de reparacion (Mecanico y Administrador)
     /**
-     * Cambia el estado de la reparación a medida que se van realizando las tareas propias de la reparación
-     * */
+ 	 * Cambia el estado de una reparación. Muestra las reparaciones por matrícula,
+ 	 * pide el ID de la reparación a modificar por consola y aplica el nuevo estado.
+ 	 * @param matricula La matrícula del vehículo cuyas reparaciones se listarán.
+ 	 * @param estado La cadena que representa el nuevo estado (debe coincidir con un valor del Enum  Estado).
+ 	 */
     public void cambiarEstadoReparacion(String matricula, String estado) {
     	ArrayList<Reparacion> listaReparaciones = reparacionDAO.findByMatricula(matricula);
     	
@@ -162,6 +194,9 @@ public class ControladorTaller {
     
     //Metodos para el CU5, Gestion de clientes y vehiculos (Administrador)
     //Clientes
+    /**
+ 	 * Solicita interactivamente todos los datos de un nuevo cliente por consola y lo inserta en la base de datos.
+ 	 */
     public void altaCliente() {
     	System.out.println("****ALTA NUEVO CLIENTE****");
     	
@@ -201,6 +236,10 @@ public class ControladorTaller {
          
     }
     
+    /**
+ 	 * Permite modificar interactivamente los datos de un cliente (Nombre, DNI, Teléfono, Email)
+ 	 * buscando por DNI y solicitando los nuevos valores por consola.
+ 	 */
     public void modificarCliente() {
     	System.out.println("****MODIFICAR CLIENTE****");
     	System.out.println("Introduce el dni del cliente a modificar: ");
@@ -261,6 +300,9 @@ public class ControladorTaller {
         System.out.println("Cliente actualizado correctamente.");
     }
     
+    /**
+ 	 * Solicita el DNI por consola y elimina el cliente correspondiente de la base de datos.
+ 	 */
     public void eliminarCliente() {
     	System.out.println("****ELIMINAR CLIENTE****");
     	System.out.println("Introduce el dni del cliente a eliminar: ");
@@ -270,6 +312,10 @@ public class ControladorTaller {
     }
     
     //Vehiculos
+    /**
+ 	 * Solicita interactivamente los datos de un nuevo vehículo (matrícula, marca, modelo) 
+ 	 * y el DNI de un cliente para asociarlo, insertándolo en la base de datos.
+ 	 */
     public void altaVehiculo() {
     	System.out.println("****ALTA VEHICULO****");
         String matricula;
@@ -315,6 +361,10 @@ public class ControladorTaller {
         
     }
     
+    /**
+ 	 * Permite modificar interactivamente los datos de un vehículo (matrícula, marca, modelo)
+ 	 * o reasignarlo a un nuevo cliente, buscando por matrícula y utilizando la consola para la interacción.
+ 	 */
     public void modificarVehiculo() {
     	System.out.println("****MODIFICAR VEHICULO****");
     	System.out.print("Introduce la matrícula del vehículo a modificar: ");
@@ -411,6 +461,9 @@ public class ControladorTaller {
         System.out.println("El vehículo se ha actualizado correctamente.");
     }
 	
+    /**
+ 	 * Solicita la matrícula por consola y elimina el vehículo correspondiente de la base de datos.
+ 	 */
     public void eliminarVehiculo() {
     	System.out.println("****ELIMINAR Vehiculo****");
     	System.out.println("Introduce la matricula del vehiculo a eliminar: ");
@@ -420,8 +473,12 @@ public class ControladorTaller {
     }
     
     //Metodos para la gestion de los usuarios
+    /**
+ 	 * Solicita interactivamente todos los datos de un nuevo usuario (nombre, DNI, contraseña y rol)
+ 	 * por consola y lo registra.
+ 	 */
     public void altaUsuario() {
-System.out.println("****ALTA NUEVO USUARIO****");
+    	System.out.println("****ALTA NUEVO USUARIO****");
     	
     	//Pedimos los datos
     	 String nombre;
@@ -458,6 +515,10 @@ System.out.println("****ALTA NUEVO USUARIO****");
          usuarioDAO.insert(u);
     }
     
+    /**
+ 	 * Permite modificar interactivamente los datos de un usuario existente (Nombre, DNI, Contraseña, Rol)
+ 	 * buscando por DNI y solicitando los nuevos valores por consola.
+ 	 */
     public void modificarUsuario() {
     	System.out.println("****MODIFICAR USUARIO****");
     	System.out.println("Introduce el dni del usuario a modificar: ");
@@ -520,11 +581,103 @@ System.out.println("****ALTA NUEVO USUARIO****");
         System.out.println("Usuario actualizado correctamente.");
     }
     
+    /**
+ 	 * Solicita el DNI por consola y elimina el usuario correspondiente de la base de datos.
+ 	 */
     public void eliminarUsuario() {
     	System.out.println("****ELIMINAR Usuario****");
     	System.out.println("Introduce el dni del usuario a eliminar: ");
     	String dniEliminar = entrada.nextLine();
     	usuarioDAO.delete(dniEliminar);
     	
+    }
+    
+    //CU6, calcular el coste promedio de las reparaciones finalizadas
+    /**
+ 	 * Muestra por consola el coste promedio de todas las reparaciones cuyo estado es FINALIZADA.
+ 	 */
+    public double calcularCostePromedio() {
+    	return reparacionDAO.costePromedio();
+    }
+    
+    //Listar vehiculos
+    /**
+ 	 * Lista por consola todos los vehículos registrados en el sistema.
+ 	 */
+    public ArrayList<Vehiculo> listarVehiculos() {
+    	ArrayList<Vehiculo> listaVehiculos = vehiculoDAO.findAll();
+    	
+    	
+    	System.out.println("\n*** LISTADO DE VEHICULOS ***");
+    	for(Vehiculo v : listaVehiculos) {
+    		System.out.println(" Id: " + v.getId_vehiculo() + 
+                    "\nMatricula: " + v.getMatricula() + 
+                    "\nMarca: " + v.getMarca()+ 
+                    "\nModelo: " + v.getModelo() +
+                    "\nCliente id: " + v.getCliente_id());
+    		
+    	}
+    	return listaVehiculos;
+    }
+    
+    //Listar clientes
+    /**
+ 	 * Lista por consola todos los clientes registrados en el sistema.
+ 	 */
+    public ArrayList<Cliente> listarClientes() {
+    	ArrayList<Cliente> listaClientes = clienteDAO.findAll();
+    	
+    	
+    	System.out.println("\n*** LISTADO DE CLIENTES ***");
+    	for(Cliente c : listaClientes) {
+    		System.out.println(" Id: " + c.getId_cliente() + 
+                    "\nNombre: " + c.getNombre() + 
+                    "\nDni: " + c.getDni_cliente()+ 
+                    "\nTelefono: " + c.getTelefono() +
+                    "\nEmail: " + c.getEmail());
+    		
+    	}
+    	return listaClientes;
+    }
+    
+    //Listar usuarios
+    /**
+ 	 * Lista por consola todos los usuarios (mecánicos/administradores) registrados en el sistema.
+ 	 */
+    public ArrayList<Usuario> listarUsuarios() {
+    	ArrayList<Usuario> listaUsuarios = usuarioDAO.findAll();
+    	
+    	
+    	System.out.println("\n*** LISTADO DE USUARIOS ***");
+    	for(Usuario u : listaUsuarios) {
+    		System.out.println(" Id: " + u.getId_usuario() + 
+                    "\nNombre: " + u.getNombre_usuario() + 
+                    "\nDni: " + u.getDni_usuario()+ 
+                    "\nRol: " + u.getRol());
+    		
+    	}
+    	return listaUsuarios;
+    }
+    
+    //Listar reparaciones
+    /**
+ 	 * Lista por consola todas las reparaciones registradas en el sistema.
+ 	 */
+    public ArrayList<Reparacion> listarReparaciones() {
+    	ArrayList<Reparacion> listarReparaciones = reparacionDAO.findAll();
+    	
+    	
+    	System.out.println("\n*** LISTADO DE REPARACIONES ***");
+    	for(Reparacion rep : listarReparaciones) {
+    		System.out.println(" Id: " + rep.getId_reparacion() + 
+                    "\nDescripcion: " + rep.getDescripcion() + 
+                    "\nFecha entrada: " + rep.getFecha_entrada()+ 
+                    "\ncoste estimado: " + rep.getCoste_estimado() +
+                    "\nEstado: " + rep.getEstado() +
+                    "\nVehiculo id: " + rep.getVehiculo_id() +
+                    "\nUsuario id: " + rep.getUsuario_id());
+    		
+    	}
+    	return listarReparaciones;
     }
 }

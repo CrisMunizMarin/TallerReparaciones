@@ -34,7 +34,6 @@ descripcion VARCHAR(255) NOT NULL,
 fecha_entrada DATE NOT NULL,
 coste_estimado DOUBLE NOT NULL,
 estado ENUM("PENDIENTE", "REPARACION", "FINALIZADO") default "PENDIENTE",
-fecha_salida DATE NULL,
 vehiculo_id INT,
 usuario_id INT,
 FOREIGN KEY (vehiculo_id) REFERENCES vehiculo(id_vehiculo) ON DELETE CASCADE, -- Si se elimina un vehiculo, todas sus reparaciones se eliminan automaticamnete

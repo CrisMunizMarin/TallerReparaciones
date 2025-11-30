@@ -256,7 +256,7 @@ private Connection conexion;
 		ArrayList<Reparacion> listaFinalizadas = new ArrayList<>();
 		
 		for(Reparacion rep : listaReparaciones) {
-			if(rep.getEstado() == Estado.FINALIZADO) {
+			if(rep.getEstado().equals(Estado.FINALIZADO)) {
 				listaFinalizadas.add(rep);
 			}
 		}
@@ -312,6 +312,32 @@ private Connection conexion;
 	       
 	    }
 	    return listaVehiculosMatricula;
+	}
+	
+	//CU6 Estadísticas (Se hace un metodo que nos de la media del coste de las reparaciones finalizadas)
+	/**
+	 * Calcula el coste promedio de todas las reparaciones FINALIZADAS.
+	 * @return El coste promedio como double.
+	 */
+	public double costePromedio() {
+	    double promedio = 0.0;
+	    
+	    String sql = "SELECT AVG(coste_estimado) AS promedio FROM reparacion WHERE estado = 'FINALIZADO'";
+	    
+	    // Asumiendo que usas JDBC:
+	    try (PreparedStatement pst = conexion.prepareStatement(sql);
+	         ResultSet rs = pst.executeQuery()) {
+	        
+	        if (rs.next()) {
+	            promedio = rs.getDouble("promedio");
+	        }
+	        
+	    } catch (SQLException e) {
+	        System.out.println("Error al calcular el promedio: " + e.getMessage());
+	        
+	    }
+	    
+	    return promedio;
 	}
 
 }

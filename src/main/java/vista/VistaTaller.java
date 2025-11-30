@@ -7,6 +7,14 @@ import dao.mysql.ReparacionDAOMySQL;
 import dao.mysql.UsuarioDAOMySQL;
 import dao.mysql.VehiculoDAOMySQL;
 
+/**
+ * Clase que representa la capa de Vista del Taller, encargada de toda la
+ * interacción con el usuario (mostrar menús, solicitar datos e imprimir resultados).
+ * Sigue el patrón MVC (Modelo-Vista-Controlador).
+ *
+ * @author Cristina Muñiz
+ * @version 1.0
+ */
 public class VistaTaller {
 	//Aqui se meten los menus interactivos
 	
@@ -17,12 +25,19 @@ public class VistaTaller {
 	private Scanner entrada = new Scanner(System.in);
 	
 	
-	//Inicializamos el controlador
+	/**
+	 * Constructor de la VistaTaller. 
+	 * Inicializa la instancia única del Controlador (Singleton).
+	 */
 	public VistaTaller() {
 		controlador = ControladorTaller.getInstance();
     }
 	
-	//Menu principal, por defecto sale el menu de invitado, aqui tambien se pueden ver las reparaciones finalizadas
+	/**
+	 * Muestra el menú principal de la aplicación.
+	 * Permite iniciar sesión o visualizar las reparaciones que han finalizado.
+	 * El ciclo se repite hasta que el usuario elige la opción de salir (0).
+	 */
 	public void menuPrincipal() {
 		int opcion = -1;
 		
@@ -68,7 +83,12 @@ public class VistaTaller {
 
 
     
-    // --- case 1: Login (CU2) ---
+    //  Login (CU2) 
+	/** * Solicita al usuario su DNI y contraseña para iniciar sesión.
+	 * Llama al controlador para verificar las credenciales. Si la autenticación
+	 * es exitosa, llama a rolActivo(Usuario) para mostrar el menú correspondiente.
+	 * (Corresponde al CU2: Iniciar Sesión)
+	 */
 	private void login() {
 		System.out.println("****LOGIN****");
 		System.out.print("Usuario (DNI): ");
@@ -86,7 +106,11 @@ public class VistaTaller {
         }
 	}
 	
-	//Metodo auxiliar. Dependiendo del rol le daremos un menu u otro
+	/**
+	 * Método auxiliar que determina qué submenú debe mostrarse al usuario
+	 * después de un inicio de sesión exitoso, basado en su rol.
+	 * * @param u El objeto Usuario autenticado.
+	 */
 	private void rolActivo(Usuario u) {
 		if(u.getRol() == Rol.ADMINISTRADOR){
 			menuAdministrador();
@@ -97,8 +121,10 @@ public class VistaTaller {
 		}
 	}
 	
-	//Submenús dependiendo del rol
-	//Menu para el mecanico
+	/**
+	 * Muestra el menú específico para usuarios con el rol MECANICO.
+	 * Permite registrar nuevas reparaciones y cambiar el estado de reparaciones existentes.
+	 */
 	private void menuMecanico() {
         int opcion = -1;
 
@@ -133,7 +159,10 @@ public class VistaTaller {
         }
     }
 	
-	//Menu para el Administrador
+	/**
+	 * Muestra el menú específico para usuarios con el rol ADMINISTRADOR.
+	 * Permite acceder a la gestión de clientes/vehículos, reparaciones, usuarios y estadísticas.
+	 */
 	private void menuAdministrador() {
         int opcion = -1;
 
@@ -143,7 +172,8 @@ public class VistaTaller {
             System.out.println("2. Registrar nueva reparación"); // CU3
             System.out.println("3. Cambiar estado de reparación"); // CU4
             System.out.println("4. Gestión de Usuarios"); //CRUD
-            System.out.println("5. Consultar estadísticas"); //CU6
+            System.out.println("5. Listar reparaciones"); 
+            System.out.println("6. Consultar estadísticas"); //CU6
             System.out.println("0. Cerrar sesión");
 
             opcion = entrada.nextInt();
@@ -170,10 +200,12 @@ public class VistaTaller {
                 break;
                 
             case 5:
-            	System.out.println("En preparacion");
-                //controlador.mostrarEstadisticas();
+                controlador.listarReparaciones();
                 break;
-
+                
+            case 6:
+                mostrarEstadisticas();
+                break;
             case 0:
                 u = null;
                 return;
@@ -184,7 +216,11 @@ public class VistaTaller {
         }
 	}
 	
-	
+	/**
+	 * Muestra el submenú para la gestión de Clientes y Vehículos.
+	 * Permite realizar operaciones CRUD (Alta, Modificación, Eliminación, Listado) sobre ambas entidades.
+	 * (Corresponde al CU5: Gestión de Clientes y Vehículos)
+	 */
 	private void gestionarClientesYVehiculos() {
         int opcion = -1;
 
@@ -193,10 +229,12 @@ public class VistaTaller {
             System.out.println("1. Registrar nuevo Cliente");
             System.out.println("2. Modificar datos de Cliente");
             System.out.println("3. Eliminar Cliente");
+            System.out.println("4. Listar clientes");
             System.out.println("*******************************");
-            System.out.println("4. Registrar nuevo Vehículo");
-            System.out.println("5. Modificar Vehículo");
-            System.out.println("6. Eliminar Vehículo");
+            System.out.println("5. Registrar nuevo Vehículo");
+            System.out.println("6. Modificar Vehículo");
+            System.out.println("7. Eliminar Vehículo");
+            System.out.println("8. Listar vehiculos");
             System.out.println("0. Volver al Menú de Administrador");
             
             opcion = entrada.nextInt();
@@ -217,16 +255,24 @@ public class VistaTaller {
                 break;
                 
             case 4:
+            	controlador.listarClientes();
+            	break;
+                
+            case 5:
                 controlador.altaVehiculo(); 
                 break;
 
-            case 5:
+            case 6:
                 controlador.modificarVehiculo(); 
                 break;
                 
-            case 6:
+            case 7:
                 controlador.eliminarVehiculo(); 
                 break;
+            
+            case 8:
+            	controlador.listarVehiculos();
+            	break;
                 
             case 0:
                return;
@@ -237,6 +283,10 @@ public class VistaTaller {
         }
      }
 	
+	/**
+	 * Muestra el submenú para la gestión de Usuarios.
+	 * Permite realizar operaciones CRUD sobre los usuarios del sistema.
+	 */
 	private void gestionUsuarios() {
 		int opcion = -1;
 		
@@ -245,6 +295,7 @@ public class VistaTaller {
             System.out.println("1. Registrar nuevo Usuario");
             System.out.println("2. Modificar datos de Usuario");
             System.out.println("3. Eliminar Usuario");
+            System.out.println("4. Listar usuarios");
             System.out.println("0. Volver al Menú de Administrador");
             
             opcion = entrada.nextInt();
@@ -263,6 +314,10 @@ public class VistaTaller {
             case 3:
                 controlador.eliminarUsuario(); 
                 break;
+               
+            case 4:
+                controlador.listarUsuarios(); 
+                break;
             default:
                 System.out.println(" Opción incorrecta");
             }
@@ -271,10 +326,11 @@ public class VistaTaller {
 	}
 	
 	
-	//Metodo registrarReparacion.
 	/**
-	 * Tenemos que hacer aqui otro metodo complementario al que tenenmos en el controlador
-	 * el del controlador se encarga de insertar la reparacion pero este se encarga de pedir los datos*/
+	 * Solicita los datos necesarios al usuario para registrar una nueva reparación (CU3).
+	 * Una vez recopilados, delega la validación e inserción al Controlador.
+	 * * @param u El usuario (Mecánico o Administrador) que realiza el registro.
+	 */
 	private void registrarReparacion(Usuario u) {
 		System.out.println("Introduzca la matricula del vehiculo: ");
 		String matricula = entrada.nextLine();
@@ -295,10 +351,11 @@ public class VistaTaller {
 		controlador.registrarReparacion(matricula, descripcion,fecha , coste, dni_usuario);
 	}
 	
-	//Metodo cambiarEstadoReparacion
 	/**
-	 * Como en el metodo anterior debemos hacer un metodo completemario al del controlador. 
-	 * El de la vista se encarga de pedir los datos y el del controlador es el que realiza el cambio del estado*/
+	 * Solicita la matrícula de un vehículo y el nuevo estado de la reparación (CU4).
+	 * Muestra un menú para que el usuario elija entre 'REPARACION' y 'FINALIZADO'.
+	 * Llama a otro metodo dentro del controladorTaller para realizar la lógica de los datos.
+	 */
 	private void cambiarEstadoReparacion() {
 		//Se pide la matricula del vehiculo para cambiar su estado
 		System.out.println("Introduzca una matricula: ");
@@ -329,7 +386,30 @@ public class VistaTaller {
 		controlador.cambiarEstadoReparacion(matricula, estado);
 	}
 	
+	/**
+	 * Muestra las estadísticas del taller (CU6), como el coste promedio de las reparaciones finalizadas.
+	 * Delega el cálculo al Controlador y se encarga únicamente de la presentación y formato.
+	 */
+	private void mostrarEstadisticas() {
+		System.out.println("\n*** CONSULTA DE ESTADÍSTICAS ***");
+	    
+	    // 1. Llamar al Controlador para obtener el dato
+	    double promedio = controlador.calcularCostePromedio();
+	    
+	    // 2. Lógica de presentación y formato
+	    if (promedio > 0) {
+	        System.out.println("Coste Promedio de Reparaciones Finalizadas: " + 
+	                           String.format("%.2f", promedio) + " €");
+	    } else {
+	        System.out.println("No hay datos de reparaciones finalizadas.");
+	    }
+	}
 	
+	/**
+	 * Método principal (main) que inicializa los DAOs, el Controlador y la Vista,
+	 * y arranca la aplicación con la presentación del menú principal.
+	 * * @param args Argumentos de la línea de comandos.
+	 */
 	public static void main(String[] args) {
 		// Inicializamos DAO
         VehiculoDAOMySQL daoVehiculo = new VehiculoDAOMySQL();
@@ -337,13 +417,13 @@ public class VistaTaller {
         UsuarioDAOMySQL daoUsuario = new UsuarioDAOMySQL();
         ReparacionDAOMySQL daoReparacion = new ReparacionDAOMySQL();
         
-        Usuario inicioAdmin = new Usuario("Gonzalo","12345678Z","gonzalo",Rol.ADMINISTRADOR);
-        Usuario inicioMecanico = new Usuario("Gonzalo","12345678A","gonza",Rol.MECANICO);
+        Usuario administrador = new Usuario("Marcos","12121212Z","marcosAd",Rol.ADMINISTRADOR);
+        Usuario mecanico = new Usuario("Ana","23232323A","anaMc",Rol.MECANICO);
         
         
-        //Inserto tus usuarios
-        daoUsuario.insert(inicioAdmin);
-        daoUsuario.insert(inicioMecanico);
+        //Inserccion de usuarios de prueba
+        daoUsuario.insert(administrador);
+        daoUsuario.insert(mecanico);
 
         // Inicializamos el controlador singleton.
         ControladorTaller.inicio(daoVehiculo, daoCliente, daoUsuario, daoReparacion);
